@@ -15,3 +15,7 @@ $('#stop').click(function() {
 $('#reset').click(function() {
     socket.emit('click:reset');
 });
+
+$('#resetShort').click(function() {
+    socket.emit('click:resetShort');
+});

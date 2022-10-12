@@ -2,6 +2,9 @@ var util    = require('util'),
     events  = require('events')
     _       = require('underscore');
 
+var DEFAULT_TIME = 45* 60 * 1000;
+var DEFAULT_SHORT_TIME = 5 * 60 * 1000;
+
 // ---------------------------------------------
 // Constructor
 // ---------------------------------------------
@@ -13,7 +16,9 @@ function Stopwatch() {
     this.hour = 3600000;
     this.minute = 60000;
     this.second = 1000;
-    this.time = this.hour;
+    this.defaultTime = DEFAULT_TIME;
+    this.defaultShortTime = DEFAULT_SHORT_TIME;
+    this.time = this.defaultTime;
     this.interval = undefined;
 
     events.EventEmitter.call(this);
@@ -55,7 +60,19 @@ Stopwatch.prototype.stop = function() {
 
 Stopwatch.prototype.reset = function() {
     console.log('Resetting Stopwatch!');
-    this.time = this.hour;
+    this.time = this.defaultTime;
+    this.emit('reset:stopwatch', this.formatTime(this.time));
+};
+
+Stopwatch.prototype.zero = function() {
+    console.log('Zeroing Stopwatch!');
+    this.time = 1000;
+    this.emit('reset:stopwatch', this.formatTime(this.time));
+};
+
+Stopwatch.prototype.resetShort = function() {
+    console.log('Resetting Stopwatch to Short!');
+    this.time = this.defaultShortTime;
     this.emit('reset:stopwatch', this.formatTime(this.time));
 };
 

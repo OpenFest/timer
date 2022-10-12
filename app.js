@@ -35,9 +35,13 @@ io.configure(function () {
 
 // Use the port that Heroku provides or default to 5000
 var port = process.env.PORT || 5000; 
-app.listen(port, function() {
-  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+var host = process.env.HOST || '0.0.0.0';
+app.listen(port, host, function() {
+  console.log("Express server listening on %j in %s mode", app.address(), app.settings.env);
 });
+
+// configure title
+app.title = process.env.TITLE || 'Timer'
 
 app.get('/', routes.index);
 
@@ -63,7 +67,46 @@ io.sockets.on('connection', function (socket) {
     stopwatch.stop();
   });
 
+  socket.on('click:zero', function () {
+    stopwatch.zero();
+  });
+
   socket.on('click:reset', function () {
     stopwatch.reset();
   });
+
+  socket.on('click:resetShort', function () {
+    stopwatch.resetShort();
+  });
+});
+
+app.post('/reset/', function (req, res) {
+    stopwatch.reset();
+    res.send("OK");
+});
+app.post('/reset-short/', function (req, res) {
+    stopwatch.resetShort();
+    res.send("OK");
+});
+app.post('/start-from-reset/', function (req, res) {
+    stopwatch.reset();
+    stopwatch.start();
+    res.send("OK");
+});
+app.post('/start-from-reset-short/', function (req, res) {
+    stopwatch.resetShort();
+    stopwatch.start();
+    res.send("OK");
+});
+app.post('/start/', function (req, res) {
+    stopwatch.start();
+    res.send("OK");
+});
+app.post('/stop/', function (req, res) {
+    stopwatch.stop();
+    res.send("OK");
+});
+app.post('/zero/', function (req, res) {
+    stopwatch.zero();
+    res.send("OK");
 });
