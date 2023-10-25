@@ -1,4 +1,5 @@
-var socket = io.connect(window.location.hostname);
+//var socket = io.connect(window.location.hostname);
+var socket = io();
 
 socket.on('time', function (data) {
     $('#countdown').html(data.time);
