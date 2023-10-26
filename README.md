@@ -1,10 +1,27 @@
-# Defcon!!!
+# OpenFest Timer
+
+## Deployment
+
+Clone to `/opt/timer`.
+Put `openfest-timer@.service` in `/etc/systemd/system`.
+Requires NodeJS and npm.
+
+```bash
+systemctl daemon-reload
+npm install
+systemctl enable --now openfest-timer@hall-a.service
+systemctl enable --now openfest-timer@hall-b.service
+```
+
+## Based on Defcon
+
+### Defcon
 
 Defcon is a stopwatch running on Node.js, Express.js, and Socket.io.
 It is intended to be a good starting point if you're just learning to use
 web sockets. It currently uses xhr-polling so it is compatible with Heroku.
 
-# Who's it for?
+### Who's it for?
 
 I originally wrote Defcon over four blog posts introducing Socket.io and
 deploying to Heroku. Please checkout the posts on my site, [robdodson.me](http://robdodson.me)

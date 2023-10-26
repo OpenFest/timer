@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenFest Timer (%i)
+After=network.target
+
+[Service]
+EnvironmentFile=/opt/timer/%i.env
+Type=simple
+Restart=on-failure
+WorkingDirectory=/opt/timer
+ExecStart=/usr/bin/env node app.js
+
+[Install]
+WantedBy=multi-user.target
