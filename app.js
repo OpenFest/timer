@@ -1,4 +1,5 @@
-var express = require('express'),
+const 
+    express = require('express'),
     app = module.exports = express(),
     server = require('http').createServer(app),
     Stopwatch = require('./models/stopwatch'),
@@ -28,41 +29,43 @@ var port = process.env.PORT || 5000;
 var host = process.env.HOST || '0.0.0.0';
 
 server.listen(port, host, function() {
-        console.log("Express server listening on %j in %s mode", server.address(), app.settings.env);
-        });
+    console.log("Express server listening on %j in %s mode", server.address(), app.settings.env);
+});
+
 var stopwatch = new Stopwatch();
+
 stopwatch.on('tick:stopwatch', function(time) {
-        io.sockets.emit('time', { time: time });
-        });
+    io.sockets.emit('time', { time: time });
+});
 
 stopwatch.on('reset:stopwatch', function(time) {
-        io.sockets.emit('time', { time: time });
-        });
+    io.sockets.emit('time', { time: time });
+});
 
 stopwatch.start();
 
 io.sockets.on('connection', function (socket) {
-        io.sockets.emit('time', { time: stopwatch.getTime() });
+    io.sockets.emit('time', { time: stopwatch.getTime() });
 
-        socket.on('click:start', function () {
-                stopwatch.start();
-                });
+    socket.on('click:start', function () {
+        stopwatch.start();
+    });
 
-        socket.on('click:stop', function () {
-                stopwatch.stop();
-                });
+    socket.on('click:stop', function () {
+        stopwatch.stop();
+    });
 
-        socket.on('click:zero', function () {
-                stopwatch.zero();
-                });
+    socket.on('click:zero', function () {
+        stopwatch.zero();
+    });
 
-        socket.on('click:reset', function () {
-                stopwatch.reset();
-                });
+    socket.on('click:reset', function () {
+        stopwatch.reset();
+    });
 
-        socket.on('click:resetShort', function () {
-                stopwatch.resetShort();
-                });
+    socket.on('click:resetShort', function () {
+        stopwatch.resetShort();
+    });
 });
 
 
@@ -75,43 +78,41 @@ app.get('/', function(req, res) {
     res.render('index', { title: process.env.TITLE });
 });
 
-app.get('/control/', function(req, res) {
+
+const control = express.Router();
+
+control.get('/', function(req, res) {
     res.render('control', { title: process.env.TITLE });
 });
-
-app.post('/reset/', function (req, res) {
+control.post('/reset/', function (req, res) {
     stopwatch.reset();
     res.send("OK");
 });
-
-app.post('/reset-short/', function (req, res) {
+control.post('/reset-short/', function (req, res) {
     stopwatch.resetShort();
     res.send("OK");
 });
-
-app.post('/start-from-reset/', function (req, res) {
+control.post('/start-from-reset/', function (req, res) {
     stopwatch.reset();
     stopwatch.start();
     res.send("OK");
 });
-
-app.post('/start-from-reset-short/', function (req, res) {
+control.post('/start-from-reset-short/', function (req, res) {
     stopwatch.resetShort();
     stopwatch.start();
     res.send("OK");
 });
-
-app.post('/start/', function (req, res) {
+control.post('/start/', function (req, res) {
     stopwatch.start();
     res.send("OK");
 });
-
-app.post('/stop/', function (req, res) {
+control.post('/stop/', function (req, res) {
     stopwatch.stop();
     res.send("OK");
 });
-
-app.post('/zero/', function (req, res) {
+control.post('/zero/', function (req, res) {
     stopwatch.zero();
     res.send("OK");
 });
+
+app.use('/control', control);
