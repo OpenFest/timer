@@ -8,20 +8,20 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
     <!-- styles -->
-    <link href="/css/main.css" rel="stylesheet">
+    <link href="<%= prefix %>/css/main.css" rel="stylesheet">
 
     <!-- fonts -->
-    <link href='http://fonts.googleapis.com/css?family=Black+Ops+One' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Black+Ops+One' rel='stylesheet' type='text/css'>
 
   </head>
   <body>
     <%- body %>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/libs/jquery.js"></script>
-    <script src="/js/main.js"></script>
+    <script src="<%= prefix %>/socket.io/socket.io.js"></script>
+    <script src="<%= prefix %>/js/libs/jquery.js"></script>
+    <script src="<%= prefix %>/js/main.js"></script>
   </body>
 </html>

@@ -11,6 +11,6 @@
         "underscore": "^1.13.6"
     },
     "engines": {
-        "node": "0.6.x"
+        "node": "23.0"
     }
 }

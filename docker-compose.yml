@@ -1,0 +1,13 @@
+services:
+  timer:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      HOST: 0.0.0.0
+      #TITLE: "Hall A"
+      #PREFIX: /hall-a
+      #HALLS: "/hall-a:Hall A;/hall-b:Hall B"
+      #BASIC_AUTH: "admin:password"
+    ports:
+      - 127.0.0.1:5050:5050

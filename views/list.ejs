@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Timer</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+  </head>
+  <body>
+    <ul>
+      <% for (const hall of halls) { %>
+        <li>
+          <a href="<%= hall["prefix"] %>"><%= hall["title"] %></a>
+          <ul>
+            <a href="<%= hall["prefix"] %>/control">Control <%= hall["title"] %></a>
+          </ul>
+        </li>
+      <% } %>
+    </ul>
+  </body>
+</html>

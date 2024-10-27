@@ -1,5 +1,5 @@
-//var socket = io.connect(window.location.hostname);
-var socket = io();
+// a bit hackish way to find the path but it will get the job done
+var socket = io({"path": window.location.pathname.replace(/(\/control\/?|\/)?$/, "") + "/socket.io"});
 
 socket.on('time', function (data) {
     $('#countdown').html(data.time);

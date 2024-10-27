@@ -1,10 +1,21 @@
-#wrapper {
+.wrapper {
+  width: 95%;
+  height: 100%;
+  margin: 30vh 14vw;
+}
+
+.wrapper #countdown {
+  font-family: 'Black Ops One', cursive;
+  font-size: 15vw;
+}
+
+.control-wrapper {
   width: 475px;
   height: 171px;
   margin: 100px auto;
 }
 
-#countdown {
+.control-wrapper #countdown {
   font-family: 'Black Ops One', cursive;
   font-size: 90px;
 }
