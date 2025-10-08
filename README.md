@@ -2,48 +2,16 @@
 
 ## Deployment
 
-### Configuration
+Clone to `/opt/timer`.
+Put `openfest-timer@.service` in `/etc/systemd/system`.
+Requires NodeJS and npm.
 
-Configuration is done by environmental variables:
-
-```yaml
-HALLS: "/hall-a:Hall A;/hall-b:Hall B"
-TITLE: "Hall A"  # not in use if HALLS is set to non-empty
-PREFIX: /hall-a  # not in use if HALLS is set to non-empty
-BASIC_AUTH: "admin:password"  # user:plaintext-password
+```bash
+systemctl daemon-reload
+npm install
+systemctl enable --now openfest-timer@hall-a.service
+systemctl enable --now openfest-timer@hall-b.service
 ```
-
-### Prod Deployment
-
-```sh
-cd timer-repo/
-git pull
-podman build -t timer .
-
-cat > .config/containers/systemd/timer.container <<EOF
-[Container]
-ContainerName=timer
-Image=timer:latest
-
-Environment=PORT=5050
-Environment=HALLS="/hall-a:Hall A;/hall-b:Hall B;/test-hall:TEST"
-Environment=BASIC_AUTH="user:password"
-
-PublishPort=127.0.0.1:5050:5050
-
-Network=INSERT_THE_NETWORK
-
-[Install]
-WantedBy=default.target
-EOF
-
-systemctl --user daemon-reload
-systemctl --user restart timer
-```
-
-### Local Development
-
-`docker-compose up --build`
 
 ## Based on Defcon
 
