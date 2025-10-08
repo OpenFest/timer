@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenFest Timer
+After=network.target
+
+[Service]
+RuntimeDirectory=timer
+Type=simple
+Restart=on-failure
+RestartSec=5
+WorkingDirectory=/opt/timer
+ExecStart=/usr/bin/env node app.js
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

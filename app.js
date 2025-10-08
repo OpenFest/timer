@@ -1,165 +1,104 @@
-const 
-    express = require('express'),
-    app = module.exports = express(),
-    server = require('http').createServer(app),
-    Stopwatch = require('./models/stopwatch'),
-    errorHandler = require('errorhandler'),
-    expressLayouts = require('express-ejs-layouts');
+'use strict';
 
-const auth = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+import express from 'express';
+import { createServer } from 'http';
+import errorHandler from 'errorhandler';
+import expressLayouts from 'express-ejs-layouts';
+import config from './config.js';
+import { Server as SIO } from 'socket.io';
 
-    if (!authHeader) {
-        return res.set("WWW-Authenticate", "Basic realm='timer'").status(401).send('Unauthorized');
-    }
-    else {
-        const authTokens = authHeader.split(' ');
-        if (authTokens[0] === 'Basic') {
-            const credentials = Buffer.from(authTokens[1], 'base64').toString('utf8');
+import Stopwatch from './stopwatch.js';
 
-            if (credentials !== process.env.BASIC_AUTH) {  // this is obviously not the most secure way, but we don't care
-                return res.status(401).send('Unauthorized');
-            }
-            else {
-                next();
-            }
-        } else {
-            return res.status(401).send('Unauthorized');
-        }
-    }
-};
+const app = express();
+const server = createServer(app);
+const io = new SIO(server, {});
 
 // Configuration
 
-if (process.env.BASIC_AUTH) {
-    app.use(auth);
-}
-
-app.set('views', __dirname + '/views');
+app.set('views', './views');
 app.set('view engine', 'ejs');
 
+app.use(expressLayouts);
+app.use(express.static('./public'));
+
+server.listen(config.listen, () => {
+  console.log('server started');
+});
+
+process.on('SIGINT', () => server.close(() => process.exit(0)));
+process.on('SIGTERM', () => server.close(() => process.exit(0)));
+
 if (process.env.NODE_ENV === 'development') {
-    app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(errorHandler());
+for (const [slug, name] of Object.entries(config.rooms)) {
+  const stopwatch = new Stopwatch();
+
+  const ns = io.of(`/${slug}`);
+
+  stopwatch.on('tick:stopwatch', (time) => ns.emit('time', { time: time }));
+  stopwatch.on('reset:stopwatch', (time) => ns.emit('time', { time: time }));
+
+  stopwatch.start();
+
+  ns.on('connection', function (socket) {
+    ns.emit('time', { time: stopwatch.getTime() });
+
+    socket.on('click:start', () => stopwatch.start());
+    socket.on('click:stop', () => stopwatch.stop());
+    socket.on('click:zero', () => stopwatch.zero());
+    socket.on('click:reset', () => stopwatch.reset());
+    socket.on('click:resetShort', () => stopwatch.resetShort());
+  });
+
+  const roomRouter = express.Router();
+
+  roomRouter.get('/', function (req, res) {
+    res.render('index', { title: name, room: slug });
+  });
+
+  const control = express.Router();
+
+  control.get('/', function (req, res) {
+    res.render('control', { title: name, room: slug });
+  });
+  control.post('/reset/', function (req, res) {
+    stopwatch.reset();
+    res.send('OK');
+  });
+  control.post('/reset-short/', function (req, res) {
+    stopwatch.resetShort();
+    res.send('OK');
+  });
+  control.post('/start-from-reset/', function (req, res) {
+    stopwatch.reset();
+    stopwatch.start();
+    res.send('OK');
+  });
+  control.post('/start-from-reset-short/', function (req, res) {
+    stopwatch.resetShort();
+    stopwatch.start();
+    res.send('OK');
+  });
+  control.post('/start/', function (req, res) {
+    stopwatch.start();
+    res.send('OK');
+  });
+  control.post('/stop/', function (req, res) {
+    stopwatch.stop();
+    res.send('OK');
+  });
+  control.post('/zero/', function (req, res) {
+    stopwatch.zero();
+    res.send('OK');
+  });
+
+  roomRouter.use('/control', control);
+
+  app.use(`/${slug}`, roomRouter);
 }
 
-
-// Use the port and host
-var port = process.env.PORT || 5000; 
-var host = process.env.HOST || '0.0.0.0';
-
-var prefix = process.env.PREFIX || '';
-
-const halls = (process.env.HALLS || ((process.env.PREFIX || "") + ":" + (process.env.TITLE || "TIMER"))).replace("; ?$", "").split(';').map(tuple => {
-    const parts = tuple.split(':');
-    return {"prefix": parts[0].trim(), "title": parts[1].trim()};
+app.get('/', function (req, res) {
+  res.render('list', { title: 'Timer', rooms: config.rooms });
 });
-
-console.log("Configuring halls:", halls)
-
-halls.map(hall => {
-    const title = hall["title"]
-    const prefix = hall["prefix"]
-    const router = express.Router();
-
-    const io = require('socket.io')(server, {path: prefix + '/socket.io'})
-
-    router.use(expressLayouts);
-    router.use(express.static(__dirname + '/public'));
-
-    var stopwatch = new Stopwatch();
-
-    stopwatch.on('tick:stopwatch', function(time) {
-        io.sockets.emit('time', { time: time });
-    });
-
-    stopwatch.on('reset:stopwatch', function(time) {
-        io.sockets.emit('time', { time: time });
-    });
-
-    // stopwatch.start();  // we probably don't want autostart on server start
-
-    io.sockets.on('connection', function (socket) {
-        io.sockets.emit('time', { time: stopwatch.getTime() });
-
-        socket.on('click:start', function () {
-            stopwatch.start();
-        });
-
-        socket.on('click:stop', function () {
-            stopwatch.stop();
-        });
-
-        socket.on('click:zero', function () {
-            stopwatch.zero();
-        });
-
-        socket.on('click:reset', function () {
-            stopwatch.reset();
-        });
-
-        socket.on('click:resetShort', function () {
-            stopwatch.resetShort();
-        });
-    });
-
-
-    router.get('/', function(req, res) {
-        res.render('index', { title: title, prefix: prefix });
-    });
-
-
-    const control = express.Router();
-
-    control.get('/', function(req, res) {
-        res.render('control', { title: title, prefix: prefix });
-    });
-    control.post('/reset/', function (req, res) {
-        stopwatch.reset();
-        res.send("OK");
-    });
-    control.post('/reset-short/', function (req, res) {
-        stopwatch.resetShort();
-        res.send("OK");
-    });
-    control.post('/start-from-reset/', function (req, res) {
-        stopwatch.reset();
-        stopwatch.start();
-        res.send("OK");
-    });
-    control.post('/start-from-reset-short/', function (req, res) {
-        stopwatch.resetShort();
-        stopwatch.start();
-        res.send("OK");
-    });
-    control.post('/start/', function (req, res) {
-        stopwatch.start();
-        res.send("OK");
-    });
-    control.post('/stop/', function (req, res) {
-        stopwatch.stop();
-        res.send("OK");
-    });
-    control.post('/zero/', function (req, res) {
-        stopwatch.zero();
-        res.send("OK");
-    });
-
-    router.use('/control', control);
-
-    app.use(prefix, router);
-});
-
-server.listen(port, host, function() {
-    console.log("Express server listening on %j in %s mode", server.address(), app.settings.env);
-});
-
-if (halls.length != 1 && halls[0]["prefix"] != "") {
-    app.get('/', function(req, res) {
-        res.render("list", { layout: false, halls: halls });
-    });
-}
-
