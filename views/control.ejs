@@ -3,10 +3,11 @@
     <div id="countdown"></div>
     <button id="start" class="thoughtbot">Start</button>
     <button id="stop" class="thoughtbot">Stop</button>
-    <button id="reset" class="thoughtbot">Reset</button>
-    <button id="unused2" class="thoughtbot">&nbsp;</button>
-    <button id="zero" class="thoughtbot">&nbsp;</button>
-    <button id="resetShort" class="thoughtbot">Reset Short</button>
+<br/>
+
+<% for(let [ name, length ] of Object.entries(timers)) { %>
+    <button class="reset" data-name="<%= name %>" data-length="<%= length %>"><%= name %> (<%= length %> min)</button>
+<% } %>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -18,8 +19,8 @@ const connectRoom = function(room) {
 
         document.getElementById('start').onclick = () => socket.emit('click:start');
         document.getElementById('stop').onclick = () => socket.emit('click:stop');
-        document.getElementById('reset').onclick = () => socket.emit('click:reset');
-        document.getElementById('resetShort').onclick = () => socket.emit('click:resetShort');
+
+        for(let btn of document.querySelectorAll('.reset')) btn.onclick = (e) => socket.emit('click:reset', e.target.dataset.length);
 }
 
 connectRoom('/<%= room %>');

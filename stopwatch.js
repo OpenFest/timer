@@ -4,9 +4,6 @@ import events from 'events';
 
 const TIMESCALE = 1000;
 
-const DEFAULT_TIME = 45 * 60 * TIMESCALE;
-const DEFAULT_SHORT_TIME = 5 * 60 * TIMESCALE;
-
 function formatTime(time) {
   time /= TIMESCALE;
 
@@ -21,7 +18,7 @@ class Stopwatch extends events.EventEmitter {
   constructor() {
     super();
 
-    this.time = DEFAULT_TIME;
+    this.time = 0;
     this.interval = undefined;
 
     this.tickRate = TIMESCALE;
@@ -32,6 +29,7 @@ class Stopwatch extends events.EventEmitter {
 
     this.interval = setInterval(this.onTick.bind(this), this.tickRate);
     this.emit('start:stopwatch');
+    this.emit('tick:stopwatch', formatTime(this.time));
   }
 
   stop() {
@@ -41,32 +39,23 @@ class Stopwatch extends events.EventEmitter {
     this.interval = undefined;
 
     this.emit('stop:stopwatch');
+    this.emit('tick:stopwatch', formatTime(this.time));
   }
 
-  reset() {
-    this.time = DEFAULT_TIME;
+  reset(time) {
+    this.time = time * 60 * TIMESCALE;
     this.emit('reset:stopwatch', formatTime(this.time));
-  }
-
-  zero() {
-    this.time = 0;
-    this.emit('reset:stopwatch', formatTime(this.time));
-  }
-
-  resetShort() {
-    this.time = DEFAULT_SHORT_TIME;
-    this.emit('reset:stopwatch', formatTime(this.time));
+    this.emit('tick:stopwatch', formatTime(this.time));
   }
 
   onTick() {
     this.time -= this.tickRate;
 
-    this.emit('tick:stopwatch', formatTime(this.time));
+    // we must cap this, so we don't get -1 as time
+    if (this.time <= 0) this.time = 0;
 
-    if (this.time <= 0) {
-      this.time = 0;
-      this.stop();
-    }
+    if (this.time == 0) this.stop();
+    else this.emit('tick:stopwatch', formatTime(this.time));
   }
 
   getTime() {

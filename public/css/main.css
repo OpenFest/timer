@@ -9,7 +9,7 @@
   font-size: 90px;
 }
 
-button.thoughtbot {
+#wrapper button {
   background-color: #ee432e;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ee432e), color-stop(50%, #c63929), color-stop(50%, #b51700), color-stop(100%, #891100));
   background-image: -webkit-linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
@@ -33,7 +33,7 @@ button.thoughtbot {
   width: 150px;
 }
 
-button.thoughtbot:hover {
+#wrapper button:hover {
   background-color: #f37873;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f37873), color-stop(50%, #db504d), color-stop(50%, #cb0500), color-stop(100%, #a20601));
   background-image: -webkit-linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
@@ -44,7 +44,7 @@ button.thoughtbot:hover {
   cursor: pointer;
 }
 
-button.thoughtbot:active {
+#wrapper button:active {
   background-color: #d43c28;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d43c28), color-stop(50%, #ad3224), color-stop(50%, #9c1500), color-stop(100%, #700d00));
   background-image: -webkit-linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);

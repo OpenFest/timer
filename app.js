@@ -25,8 +25,12 @@ server.listen(config.listen, () => {
   console.log('server started');
 });
 
-process.on('SIGINT', () => server.close(() => process.exit(0)));
-process.on('SIGTERM', () => server.close(() => process.exit(0)));
+function gracefulExit() {
+  io.close(() => process.exit(0));
+}
+
+process.on('SIGINT', () => gracefulExit());
+process.on('SIGTERM', () => gracefulExit());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(errorHandler({ dumpExceptions: true, showStack: true }));
@@ -47,9 +51,7 @@ for (const [slug, name] of Object.entries(config.rooms)) {
 
     socket.on('click:start', () => stopwatch.start());
     socket.on('click:stop', () => stopwatch.stop());
-    socket.on('click:zero', () => stopwatch.zero());
-    socket.on('click:reset', () => stopwatch.reset());
-    socket.on('click:resetShort', () => stopwatch.resetShort());
+    socket.on('click:reset', (time) => stopwatch.reset(time));
   });
 
   const roomRouter = express.Router();
@@ -58,43 +60,9 @@ for (const [slug, name] of Object.entries(config.rooms)) {
     res.render('index', { title: name, room: slug });
   });
 
-  const control = express.Router();
-
-  control.get('/', function (req, res) {
-    res.render('control', { title: name, room: slug });
+  roomRouter.get('/control', function (req, res) {
+    res.render('control', { title: name, room: slug, timers: config.timers });
   });
-  control.post('/reset/', function (req, res) {
-    stopwatch.reset();
-    res.send('OK');
-  });
-  control.post('/reset-short/', function (req, res) {
-    stopwatch.resetShort();
-    res.send('OK');
-  });
-  control.post('/start-from-reset/', function (req, res) {
-    stopwatch.reset();
-    stopwatch.start();
-    res.send('OK');
-  });
-  control.post('/start-from-reset-short/', function (req, res) {
-    stopwatch.resetShort();
-    stopwatch.start();
-    res.send('OK');
-  });
-  control.post('/start/', function (req, res) {
-    stopwatch.start();
-    res.send('OK');
-  });
-  control.post('/stop/', function (req, res) {
-    stopwatch.stop();
-    res.send('OK');
-  });
-  control.post('/zero/', function (req, res) {
-    stopwatch.zero();
-    res.send('OK');
-  });
-
-  roomRouter.use('/control', control);
 
   app.use(`/${slug}`, roomRouter);
 }
