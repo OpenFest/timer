@@ -1,3 +1,14 @@
-<div class="wrapper">
+<div id="wrapper">
     <div id="countdown"></div>
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const connectRoom = function(room) {
+        var socket = io(room);
+
+        socket.on('time', (data) => document.getElementById('countdown').innerHTML = data.time);
+}
+
+connectRoom('/<%= room %>');
+</script>

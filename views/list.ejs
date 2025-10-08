@@ -1,21 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Timer</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-  </head>
-  <body>
-    <ul>
-      <% for (const hall of halls) { %>
-        <li>
-          <a href="<%= hall["prefix"] %>"><%= hall["title"] %></a>
-          <ul>
-            <a href="<%= hall["prefix"] %>/control">Control <%= hall["title"] %></a>
-          </ul>
-        </li>
-      <% } %>
-    </ul>
-  </body>
-</html>
+<style>
+table {
+    font-size: xx-large;
+    width: 100%;
+    height: 100%;
+}
+td a {
+    padding: 1em;
+    box-sizing: border-box;
+    width: 100%;
+}
+</style>
+<div id="wrapper">
+<table>
+    <% for(let [slug, room] of Object.entries(rooms)) { %>
+<tr>
+        <td><a href="<%= slug %>/"><%= room %></a></td>
+        <td><a href="<%= slug %>/control"><%= room %> control</a></td>
+</tr>
+    <% } %>
+</table>
+</div>
