@@ -1,16 +1,25 @@
 {
-    "name": "application-name",
+    "name": "openfest-timer",
     "version": "0.0.1",
     "private": true,
-    "dependencies": {
-        "ejs": "^3.1.9",
-        "errorhandler": "^1.5.1",
-        "express": "^4.18.2",
-        "express-ejs-layouts": "^2.5.1",
-        "socket.io": "^4.7.2",
-        "underscore": "^1.13.6"
+    "type": "module",
+    "scripts": {
+        "format": "prettier --write *.js",
+        "dev": "node ./app.js",
+        "lint": "eslint"
     },
-    "engines": {
-        "node": "23.0"
+    "dependencies": {
+        "ejs": "^3.1.10",
+        "errorhandler": "^1.5.1",
+        "express": "^5.1.0",
+        "express-ejs-layouts": "^2.5.1",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.37.0",
+        "eslint": "^9.37.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^16.4.0",
+        "prettier": "^3.6.2"
     }
 }
