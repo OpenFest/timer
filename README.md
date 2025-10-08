@@ -3,14 +3,14 @@
 ## Deployment
 
 Clone to `/opt/timer`.
-Put `openfest-timer@.service` in `/etc/systemd/system`.
+Put `openfest-timer.service` in `/etc/systemd/system`.
+Configure the actual rooms in `config.js`.
 Requires NodeJS and npm.
 
 ```bash
 systemctl daemon-reload
 npm install
-systemctl enable --now openfest-timer@hall-a.service
-systemctl enable --now openfest-timer@hall-b.service
+systemctl enable --now openfest-timer.service
 ```
 
 ## Based on Defcon
